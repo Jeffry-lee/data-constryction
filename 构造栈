@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define STACK_INIT_SIZE 50
+#define STACKINCREMENT 10
+#define ERROR 0
+#define OK 1
+typedef char SElemType;
+typedef struct {
+    SElemType* base;
+    SElemType* top;
+    int stacksize;
+}SqStack;
+
+
+void InitStack(SqStack* S)  //构造一个空栈S
+{
+    S->base = (SElemType*)malloc(STACK_INIT_SIZE * sizeof(SElemType));
+    if (!(S->base))
+        printf("Oh,no!");
+    S->top = S->base;
+    S->stacksize = STACK_INIT_SIZE;
+}
+
+void Push(SqStack* S, SElemType e)  //插入元素e为新的栈顶元素
+{
+    if (S->top - S->base >= S->stacksize) {
+        S->base = (SElemType*)realloc(S->base, (S->stacksize + STACKINCREMENT) * sizeof(SElemType));
+        if (!S->base)
+            printf("Oh,no!");;
+        S->top = S->base + S->stacksize;
+        S->stacksize += STACKINCREMENT;
+    }
+    *S->top++ = e;
+}
+
+void Pop(SqStack* S, SElemType* e)  //删除S的栈顶元素
+{
+    if (S->top == S->base)
+        printf("Oh,no!");
+    *e = *(--(S->top));
+}
+
+SElemType SEmpty(SqStack* S)
+{
+    if (S->top == S->base)
+        return OK;
+    else
+        return ERROR;
+}
+
+SElemType DestroyStack(SqStack* S)
+{
+    if (S->base) {
+        free(S->base);
+        S->stacksize = 0;
+        S->base = S->top = NULL;
+    }
+    return OK;
+}
+
+int main()
+{
+    SqStack S;
+    SElemType x;
+    SElemType y;
+    x = 'c';
+    y = 'k';
+
+    InitStack(&S);
+
+    Push(&S, x);
+    Push(&S, 'a');
+    Push(&S, y);
+    Pop(&S, &x);
+    Push(&S, 't');
+    Push(&S, x);
+    Pop(&S, &x);
+    Push(&S, 's');
+
+    while (!SEmpty(&S)) {
+        Pop(&S, &y);
+        printf("%c", y);
+    }
+    printf("%c", x);
+    printf("\n");
+
+    DestroyStack(&S);
+    return 0;
+}
